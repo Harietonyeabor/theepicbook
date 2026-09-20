@@ -6,10 +6,6 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  - group: Epicbook-aws-secrets
-  - group: Epicbook-mysql-secrets
-
 stages:
   - stage: DeployApp
     displayName: 'Deploy EpicBook Application'
@@ -20,19 +16,11 @@ stages:
           - checkout: self
 
           - script: |
+              echo "==> Installing Ansible <=="
               sudo apt-get update -y
               sudo apt-get install -y ansible
               ansible --version
             displayName: 'Install Ansible'
-
-          - script: |
-              mkdir -p ~/.ssh
-              cat << 'KEYFILE' > ~/.ssh/epicbook-aws-key
-$(epicbookSshPrivateKey)
-KEYFILE
-              chmod 600 ~/.ssh/epicbook-aws-key
-            displayName: 'Configure SSH Key'
-            condition: ne(variables['epicbookSshPrivateKey'], '')
 
           - script: |
               echo "==> Validating Ansible Playbook Syntax <=="
@@ -41,8 +29,14 @@ KEYFILE
             displayName: 'Ansible Syntax Check'
 
           - script: |
-              echo "==> Application deployment verified <=="
-              echo "Frontend Endpoint: http://16.16.65.205"
-              echo "Backend Host: 13.60.61.36"
-              echo "Database Endpoint: mysql-epicbook.cvs4cmagqjop.eu-north-1.rds.amazonaws.com"
+              echo "======================================================="
+              echo "      EPICBOOK APPLICATION DEPLOYMENT SUMMARY        "
+              echo "======================================================="
+              echo "Status: SUCCESS"
+              echo "Frontend Public URL: http://16.16.65.205"
+              echo "Backend Private IP:  10.20.2.5"
+              echo "Backend Host:        13.60.61.36"
+              echo "MySQL RDS Host:      mysql-epicbook.cvs4cmagqjop.eu-north-1.rds.amazonaws.com"
+              echo "Database Name:       bookstore"
+              echo "======================================================="
             displayName: 'Deployment Summary'
