@@ -1,0 +1,18 @@
+---
+- name: Apply Common Base Configuration
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+- name: Configure and Deploy Backend Application
+  hosts: backend
+  become: yes
+  roles:
+    - backend
+
+- name: Configure and Deploy Frontend Reverse Proxy
+  hosts: frontend
+  become: yes
+  roles:
+    - frontend

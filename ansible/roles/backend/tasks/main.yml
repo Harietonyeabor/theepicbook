@@ -1,0 +1,67 @@
+---
+- name: Setup NodeSource repository for Node.js
+  shell: "curl -fsSL https://deb.nodesource.com/setup_{{ node_version }}.x | bash -"
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js, npm, and MySQL client
+  apt:
+    name:
+      - nodejs
+      - mysql-client
+    state: present
+
+- name: Create application root directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: ubuntu
+    group: ubuntu
+    mode: '0755'
+
+- name: Clone or pull application code
+  git:
+    repo: "{{ app_repo }}"
+    dest: "{{ app_dir }}"
+    version: main
+    force: yes
+  become_user: ubuntu
+
+- name: Create .env configuration file
+  template:
+    src: env.j2
+    dest: "{{ app_dir }}/.env"
+    owner: ubuntu
+    group: ubuntu
+    mode: '0600'
+  notify: restart backend
+
+- name: Configure database config.json
+  template:
+    src: config.json.j2
+    dest: "{{ app_dir }}/config/config.json"
+    owner: ubuntu
+    group: ubuntu
+    mode: '0644'
+  notify: restart backend
+
+- name: Install npm dependencies
+  command: npm install --production
+  args:
+    chdir: "{{ app_dir }}"
+  become_user: ubuntu
+
+- name: Deploy systemd service file for Epicbook backend
+  template:
+    src: epicbook.service.j2
+    dest: /etc/systemd/system/epicbook.service
+    mode: '0644'
+  notify:
+    - reload systemd
+    - restart backend
+
+- name: Enable and start backend service
+  systemd:
+    name: epicbook
+    enabled: yes
+    state: restarted

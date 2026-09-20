@@ -1,0 +1,13 @@
+---
+app_repo: "https://github.com/Harietonyeabor/theepicbook.git"
+app_dir: "/var/www/theepicbook"
+node_version: "20"
+backend_port: 3000
+backend_private_ip: "10.20.2.5"
+
+# Database Configuration
+db_host: "mysql-epicbook.cvs4cmagqjop.eu-north-1.rds.amazonaws.com"
+db_port: 3306
+db_name: "bookstore"
+db_user: "epicbookadmin"
+db_password: "EpicbookSecure2026#"

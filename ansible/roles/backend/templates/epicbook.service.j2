@@ -1,0 +1,15 @@
+[Unit]
+Description=Epicbook Backend Application
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory={{ app_dir }}
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=10
+EnvironmentFile={{ app_dir }}/.env
+
+[Install]
+WantedBy=multi-user.target
